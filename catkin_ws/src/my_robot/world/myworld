@@ -6,13 +6,8 @@
     </include>
     
     <include>
-      <uri>model://myrobot</uri>
+      <uri>model://my_ball</uri>
       <pose frame=''>12 4.5 0 0 0 0</pose>
-    </include>
-
-    <include>
-      <uri>model://myrobot</uri>
-      <pose frame=''>13 1 0 0 0 0</pose>
     </include>
 
     <plugin name='hello' filename='libhello.so'/>
