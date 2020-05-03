@@ -5,10 +5,12 @@
       <uri>model://ground_plane</uri>
     </include>
 
+    <!--
     <include>
       <pose frame=''>0 0 30 0 0 0</pose>
       <uri>model://robot</uri>
     </include>
+    -->
 
     <plugin name='hello' filename='libhello.so'/>
     <light name='sun' type='directional'>
