@@ -37,34 +37,54 @@ void process_image_callback(const sensor_msgs::Image img)
 
   const int image_slice_width = img.step / 3;
   
-  std::cout << "image.width = " << img.width << std::endl;
-  std::cout << "image.step = " << img.step << std::endl;
-  
-  for (int i = 0; i < img.height; i++) 
+  int j = 0;
+  bool found = false;
+
+  for (int i = 0; not found and i < img.height; i++) 
   {
-    for (int j = 0; j < img.step; j++)
+    for (j; j < img.step-3; j += 3)
     {
-      // img.data only has one index
-      if (img.data[i*j + j] - white_pixel == 0)
+      if (img.data[i*img.step + j] == white_pixel)
       {
-        switch (j / image_slice_width) // split into 3
-        {
-          case 0: // white ball to the left
-            drive_bot(0.5, 0.5);
-            break;
-          case 1: // white ball in front
-            drive_bot(0.5, 0.0);
-            break;
-          default: // white ball to the right 
-            drive_bot(0.5, -0.5);
-            break;
-        }
+      ROS_INFO_STREAM("img.data[i*img.step + (j + 0)]" + std::to_string(img.data[i*img.step + (j + 0)]));
+      ROS_INFO_STREAM("img.data[i*img.step + (j + 1)]" + std::to_string(img.data[i*img.step + (j + 1)]));
+      ROS_INFO_STREAM("img.data[i*img.step + (j + 2)]" + std::to_string(img.data[i*img.step + (j + 2)]));
+      }
+      // img.data only has one index
+      if (img.data[i*img.step +  j     ] == white_pixel and
+          img.data[i*img.step + (j + 1)] == white_pixel and
+          img.data[i*img.step + (j + 2)] == white_pixel)
+      {
+          found = true;
+          break;
       }
     }
+    ROS_INFO_STREAM("End of j loop");
   }
 
-  // no white pixel seen so stop the bot
-  drive_bot(0.0, 0.0);
+  if (found)
+  {
+    // determine which third of image ball is
+    switch (j / image_slice_width) // split into 3
+    {
+      case 0: // white ball to the left
+        drive_bot(0.5, 0.5);
+        break;
+      case 1: // white ball in front
+        drive_bot(0.5, 0.0);
+        break;
+      default: // white ball to the right 
+        drive_bot(0.5, -0.5);
+        break;
+    }
+  }
+  else
+  {
+    // no white pixel seen so stop the bot
+    drive_bot(0.0, 0.0);
+
+  }
+
 }
 
 int main (int argc, char** argv)
