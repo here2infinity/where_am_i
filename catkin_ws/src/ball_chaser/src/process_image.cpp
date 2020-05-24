@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include "ball_chaser/DriveToTarget.h"
 #include <sensor_msgs/Image.h>
+#include <sstream>
 
 // define a globalc client that can request services
 ros::ServiceClient client;
@@ -27,6 +28,10 @@ void drive_bot(float linear_x, float angular_z)
 void process_image_callback(const sensor_msgs::Image img)
 {
   const int white_pixel = 255;
+  /*  
+  ROS_INFO_STREAM("image height" + std::to_string(img.height));
+  ROS_INFO_STREAM("image step" + std::to_string(img.step));
+  */
 
   // TODO: Loop through each pixel in the image and check if there's 
   // a bright white one. Then, identify if this pixel falls in the left,
@@ -36,30 +41,47 @@ void process_image_callback(const sensor_msgs::Image img)
   // Request a stop when there's no white ball seen by the camera
 
   const int image_slice_width = img.step / 3;
-  
-  int j = 0;
+
+  ROS_INFO_STREAM("image_slice_width =" + std::to_string(image_slice_width));
+
+  int j;
   bool found = false;
 
+  // for (int i = 0; i < img.height; i++) 
   for (int i = 0; not found and i < img.height; i++) 
   {
+    // for (j = 0; j < img.step; j++)
     for (j; j < img.step-3; j += 3)
     {
+      // std::stringstream ss;
+      // ss << "i=" << i << " j=" << j << " pixel=" << std::to_string(img.data[i*img.step + (j + 0)]);
+      // ROS_INFO_STREAM(ss.str());
+      //
+      
+      // ROS_INFO_STREAM("i=" + i + std::to_string(" j=") + j + std::to_string(" pixel=") + std::to_string(img.data[i*img.step + (j + 0)]));
+      // ROS_INFO_STREAM("img.data[i*img.step + (j + 0)]" + std::to_string(img.data[i*img.step + (j + 0)]));
+      // if (img.data[i*img.step + j] == white_pixel) {
+      //   ROS_INFO_STREAM("white pixel = "+ std::to_string(img.data[i*img.step + j]));
+      // }
       if (img.data[i*img.step + j] == white_pixel)
       {
-      ROS_INFO_STREAM("img.data[i*img.step + (j + 0)]" + std::to_string(img.data[i*img.step + (j + 0)]));
-      ROS_INFO_STREAM("img.data[i*img.step + (j + 1)]" + std::to_string(img.data[i*img.step + (j + 1)]));
-      ROS_INFO_STREAM("img.data[i*img.step + (j + 2)]" + std::to_string(img.data[i*img.step + (j + 2)]));
+    
+        ROS_INFO_STREAM("img.data[i*img.step + (j + 0)]" + std::to_string(img.data[i*img.step + (j + 0)]));
+        ROS_INFO_STREAM("img.data[i*img.step + (j + 1)]" + std::to_string(img.data[i*img.step + (j + 1)]));
+        ROS_INFO_STREAM("img.data[i*img.step + (j + 2)]" + std::to_string(img.data[i*img.step + (j + 2)]));
       }
+
       // img.data only has one index
       if (img.data[i*img.step +  j     ] == white_pixel and
           img.data[i*img.step + (j + 1)] == white_pixel and
           img.data[i*img.step + (j + 2)] == white_pixel)
       {
           found = true;
+          ROS_INFO_STREAM("found");
           break;
       }
+     
     }
-    ROS_INFO_STREAM("End of j loop");
   }
 
   if (found)
