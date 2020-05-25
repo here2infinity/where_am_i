@@ -41,12 +41,13 @@ void process_image_callback(const sensor_msgs::Image img)
 
   for (int i = 0; not found and i < img.height; i++) 
   {
-    for (j = 0; j < img.step; j++)
+    int previous_pixels = i * img.step;
+    for (j = 0; j < img.step; j+=3)
     {
       // img.data only has one index
-      if (img.data[i*img.step +  j     ] == white_pixel and
-          img.data[i*img.step + (j + 1)] == white_pixel and
-          img.data[i*img.step + (j + 2)] == white_pixel)
+      if (img.data[previous_pixels +  j     ] == white_pixel and
+          img.data[previous_pixels + (j + 1)] == white_pixel and
+          img.data[previous_pixels + (j + 2)] == white_pixel)
       {
           found = true;
           break;
@@ -61,7 +62,7 @@ void process_image_callback(const sensor_msgs::Image img)
     switch (j / image_slice_width) // split into 3
     {
       case 0: // white ball to the left
-        drive_bot(0.0, -0.5);
+        drive_bot(0.2, 0.5);
         ROS_INFO_STREAM("LEFT");
         break;
       case 1: // white ball in front
@@ -69,7 +70,7 @@ void process_image_callback(const sensor_msgs::Image img)
         ROS_INFO_STREAM("FORWARD");
         break;
       default: // white ball to the right 
-        drive_bot(0.0, 0.5);
+        drive_bot(0.2, -0.5);
         ROS_INFO_STREAM("RIGHT");
         break;
     }
